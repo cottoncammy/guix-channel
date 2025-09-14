@@ -1,0 +1,8 @@
+;;; SPDX-License-Identifier: GPL-3.0-or-later
+;; -*- mode: scheme; -*-
+
+(authorizations
+  (version 0)
+
+  (("246D A2B4 3BD4 D61B 0C91  1CCE C96F 79D9 D5B9 819D"
+    (name "cotttoncammy"))))
