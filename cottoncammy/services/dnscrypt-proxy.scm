@@ -141,7 +141,7 @@
         (shepherd-service
           (documentation "Run dnscrypt-proxy.")
           (provision shepherd-provision)
-          (requirement `(user-processes networking ,@shepherd-requirement))
+          (requirement `(user-processes loopback ,@shepherd-requirement))
           (start #~(make-forkexec-constructor
                      (list (string-append #$dnscrypt-proxy "/sbin/dnscrypt-proxy")
                            "-config" #$computed-config
