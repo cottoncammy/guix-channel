@@ -35,8 +35,8 @@
                               ,@(map (lambda (name) (string-append "wildcard/" name))
                                      (scandir "wildcard"
                                        (cut (lambda (name)
-                                              (not (string=? name "pro-onlydomains.txt"))))
-                                             <> #f))))))))
+                                              (not (string=? name "pro-onlydomains.txt")))
+                                             <> #f)))))))))
     (build-system copy-build-system)
     (arguments
       '(#:install-plan
