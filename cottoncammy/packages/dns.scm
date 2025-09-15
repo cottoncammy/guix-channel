@@ -33,7 +33,7 @@
                               ".gitignore" "LICENSE" "README.md" "index.html"
                               "sources.md"
                               ,@(map (scandir "wildcard"
-                                       (cut (file-name-predicate "^(?!pro-onlydomains.txt).*$") <> #f)))))))))
+                                  (cut (file-name-predicate "^(?!pro-onlydomains\\.txt).*$") <> #f)))))))))
     (build-system copy-build-system)
     (arguments
       '(#:install-plan
