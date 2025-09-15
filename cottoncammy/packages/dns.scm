@@ -26,7 +26,7 @@
               (snippet
                '(begin
                   (for-each (lambda (name)
-                              (when (file-exists? name)
+                              (when (not (or (string=? "." name) (string=? ".." name)))
                                 (delete-file-recursively name)))
                              `(".github" "adblock" "adguard" "controld" "dnsmasq"
                                "domains" "hosts" "ips" "pac" "rpz" "share"
