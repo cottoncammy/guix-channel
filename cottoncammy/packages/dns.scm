@@ -26,7 +26,8 @@
               (snippet
                '(begin
                   (for-each (lambda (name)
-                              (delete-file-recursively name))
+                              (when (file-exists? name)
+                                (delete-file-recursively name)))
                              `(".github" "adblock" "adguard" "controld" "dnsmasq"
                                "domains" "hosts" "ips" "pac" "rpz" "share"
                                "submit_pullrequest_here" ".gitattributes"
