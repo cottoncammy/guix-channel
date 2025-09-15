@@ -46,7 +46,7 @@
         (modify-phases %standard-phases
           (add-before 'install 'dump-wildcard
             (lambda _
-              (system* "sh" "-c" "echo 'PWD:'; pwd; echo 'LS wildcard:'; ls -la wildcard || true")
+              (system* "sh" "-c" "echo 'PWD:'; pwd; echo 'LS wildcard:'; ls -laR . || true")
               #t)))))
     (home-page "https://github.com/hagezi/dns-blocklists")
     (synopsis "DNS blocklist")
