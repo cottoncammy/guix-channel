@@ -26,14 +26,13 @@
               (snippet
                '(begin
                   (for-each (lambda (name)
-                              (when (not (or (string=? "." name) (string=? ".." name)))
-                                (delete-file-recursively name)))
+                              (delete-file-recursively name)))
                              `(".github" "adblock" "adguard" "controld" "dnsmasq"
                                "domains" "hosts" "ips" "pac" "rpz" "share"
                                "submit_pullrequest_here" ".gitattributes"
                                ".gitignore" "LICENSE" "README.md" "index.html"
                                "sources.md"
-                               ,@(map (lambda (name) name)
+                               ,@(map (lambda (name) (string-append "wildcard/" name))
                                       (scandir "wildcard"
                                         (cut (lambda (file stat)
                                                (not (string=? file "pro-onlydomains.txt")))
@@ -41,7 +40,7 @@
     (build-system copy-build-system)
     (arguments
       '(#:install-plan
-        '(("pro-onlydomains.txt" "."))))
+        '(("wildcard/pro-onlydomains.txt" "."))))
     (home-page "https://github.com/hagezi/dns-blocklists")
     (synopsis "DNS blocklist")
     (description "Blocks Ads, Affiliate, Tracking, Metrics, Telemetry, Phishing, Malware,
