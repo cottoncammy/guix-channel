@@ -33,7 +33,8 @@
                                "submit_pullrequest_here" ".gitattributes"
                                ".gitignore" "LICENSE" "README.md" "index.html"
                                "sources.md"
-                               ,@(map (scandir "wildcard"
+                               ,@(map (lambda (name) name)
+                                      (scandir "wildcard"
                                         (cut (lambda (file stat)
                                                (not (string=? file "pro-onlydomains.txt")))
                                               <> #f)))))))))
