@@ -27,7 +27,7 @@
                '(begin
                   (for-each (lambda (name)
                               (delete-file-recursively name))
-                            `(".github" "adblock" "adguard" "contrld" "dnsmasq"
+                            `(".github" "adblock" "adguard" "controld" "dnsmasq"
                               "domains" "hosts" "ips" "pac" "rpz" "share"
                               "submit_pullrequest_here" ".gitattributes"
                               ".gitignore" "LICENSE" "README.md" "index.html"
