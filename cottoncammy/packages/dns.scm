@@ -36,7 +36,7 @@
                                ,@(map (lambda (name) (string-append "wildcard/" name))
                                       (scandir "wildcard"
                                         (cut (lambda (file stat)
-                                               (not (string=? file "pro-onlydomains.txt")))
+                                               (not (string=? (basename file) "pro-onlydomains.txt")))
                                               <> #f)))))))))
     (build-system copy-build-system)
     (arguments
