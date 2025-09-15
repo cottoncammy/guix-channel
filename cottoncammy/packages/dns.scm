@@ -23,7 +23,7 @@
     (build-system copy-build-system)
     (arguments
       '(#:install-plan
-        '(("wildcard/pro-onlydomains.txt" "."))))
+        '(("wildcard/pro-onlydomains.txt" "pro-onlydomains.txt"))))
     (home-page "https://github.com/hagezi/dns-blocklists")
     (synopsis "DNS blocklist")
     (description "Blocks Ads, Affiliate, Tracking, Metrics, Telemetry, Phishing, Malware,
