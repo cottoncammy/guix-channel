@@ -11,18 +11,33 @@
 (define-public dns-blockednames
   (package
     (name "dns-blockednames")
-    (version "37512025.248.59909")
+    (version "37512025.257.63687")
     (source (origin
-              (method url-fetch)
-              (uri (format #f
-                     "https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/tags/~a/wildcard/pro-onlydomains.txt" version))
-              (file-name (string-append name version))
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/hagezi/dns-blocklists")
+                     (commit "48ff0c94185619ec3fe002af8e98c32d782a228f")))
+              (file-name (git-file-name name version))
               (sha256
-                (base32 "156mqc0wgl2w0mayhadg5smakwycv1d3q2f3x7p1j37gb63p45sn"))))
+                (base32 "07j111b5760sj4ry4m122l3rbxsy1r3i2a55mznm8dqxdbxy9igv"))
+              (modules '((guix build utils)
+                         (ice-9 ftw)
+                         (srfi srfi-26)))
+              (snippet
+               '(begin
+                  (for-each (lambda (name)
+                              (delete-file-recursively name))
+                            `(".github" "adblock" "adguard" "contrld" "dnsmasq"
+                              "domains" "hosts" "ips" "pac" "rpz" "share"
+                              "submit_pullrequest_here" ".gitattributes"
+                              ".gitignore" "LICENSE" "README.md" "index.html"
+                              "sources.md"
+                              ,@(map (scandir "wildcard"
+                                       (cut (file-name-predicate "^(?!pro-onlydomains.txt).*$") <> #f)))))))))
     (build-system copy-build-system)
     (arguments
       '(#:install-plan
-        '(("." "dns-blockednames.txt"))))
+        '(("pro-onlydomains.txt" "."))))
     (home-page "https://github.com/hagezi/dns-blocklists")
     (synopsis "DNS blocklist")
     (description "Blocks Ads, Affiliate, Tracking, Metrics, Telemetry, Phishing, Malware,
