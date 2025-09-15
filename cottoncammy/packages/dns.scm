@@ -19,35 +19,11 @@
                      (commit "48ff0c94185619ec3fe002af8e98c32d782a228f")))
               (file-name (git-file-name name version))
               (sha256
-                (base32 "07j111b5760sj4ry4m122l3rbxsy1r3i2a55mznm8dqxdbxy9igv"))
-              (modules '((guix build utils)
-                         (ice-9 ftw)
-                         (srfi srfi-26)))
-              (snippet
-               '(begin
-                  (for-each (lambda (name)
-                              (when (file-exists? name)
-                                (delete-file-recursively name)))
-                             `(".github" "adblock" "adguard" "controld" "dnsmasq"
-                               "domains" "hosts" "ips" "pac" "rpz" "share"
-                               "submit_pullrequest_here" ".gitattributes"
-                               ".gitignore" "LICENSE" "README.md" "index.html"
-                               "sources.md"
-                               ,@(map (lambda (name) (string-append "wildcard/" name))
-                                      (scandir "wildcard"
-                                        (cut (lambda (file stat)
-                                               (not (string=? (basename file) "pro-onlydomains.txt")))
-                                              <> #f)))))))))
+                (base32 "07j111b5760sj4ry4m122l3rbxsy1r3i2a55mznm8dqxdbxy9igv"))))
     (build-system copy-build-system)
     (arguments
       '(#:install-plan
-        '(("wildcard/pro-onlydomains.txt" "."))
-        #:phases
-        (modify-phases %standard-phases
-          (add-before 'install 'dump-wildcard
-            (lambda _
-              (system* "sh" "-c" "echo 'PWD:'; pwd; echo 'LS wildcard:'; ls -laR . || true")
-              #t)))))
+        '(("wildcard/pro-onlydomains.txt" "."))))
     (home-page "https://github.com/hagezi/dns-blocklists")
     (synopsis "DNS blocklist")
     (description "Blocks Ads, Affiliate, Tracking, Metrics, Telemetry, Phishing, Malware,
