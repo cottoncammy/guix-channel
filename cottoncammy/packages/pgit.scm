@@ -1,6 +1,7 @@
 ;;; SPDX-License-Identifier: GPL-3.0-or-later
 
 (define-module (cottoncammy packages pgit)
+  #:use-module (gnu packages version-control)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix git-download)
@@ -20,6 +21,7 @@
               (sha256
                 (base32 "1k3am66vzd4mfqpnp1fhi16lvvw5kzp5zhw6kn3fkpvvixln4mpk"))))
     (build-system gnu-build-system)
+    (inputs (list git))
     (home-page "https://pgit.pico.sh")
     (synopsis "Static site generator for Git repositories")
     (description "Generates a commit log, files, and references based on a Git repository
