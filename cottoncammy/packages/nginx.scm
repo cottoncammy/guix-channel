@@ -9,22 +9,23 @@
   #:use-module (guix utils))
 
 (define-public nginx
-  (package
-    (inherit web:nginx)
-    (native-inputs (list libxml2 libxslt pcre openssl zlib))
-    (arguments
-      (substitute-keyword-arguments (package-arguments web:nginx)
-        ((#:phases phases)
-          #~(modify-phases #$phases
-              (add-before 'configure 'patch-ngx-test-cc
-                (lambda _
-                  (for-each (lambda (file)
-                              (substitute* file
-                                (("^(\\s*ngx_test=\")(\\$CC)(.*)$" all begin cc end)
-                                 (string-append begin (which "gcc") end))))
-                            '("auto/endianness"
-                              "auto/feature"
-                              "auto/include"
-                              "auto/types/sizeof"
-                              "auto/types/typedef"
-                              "auto/types/uintptr_t"))))))))))
+  (let ((base web:nginx))
+    (package
+      (inherit base)
+      (native-inputs (list libxml2 libxslt pcre openssl zlib))
+      (arguments
+        (substitute-keyword-arguments (package-arguments base)
+          ((#:phases phases)
+            #~(modify-phases #$phases
+                (add-after 'patch-/bin/sh 'patch-ngx-test-cc
+                  (lambda _
+                    (for-each (lambda (file)
+                                (substitute* file
+                                  (("^(\\s*ngx_test=\")(\\$CC)(.*)$" all begin cc end)
+                                   (string-append begin (which "gcc") end))))
+                              '("auto/endianness"
+                                "auto/feature"
+                                "auto/include"
+                                "auto/types/sizeof"
+                                "auto/types/typedef"
+                                "auto/types/uintptr_t")))))))))))
