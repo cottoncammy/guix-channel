@@ -8,7 +8,7 @@
   (let ((base fonts:font-terminus))
     (package
       (inherit base)
-      (outputs (append (package-outputs base) "psf"))
+      (outputs (cons (package-outputs base) "psf"))
       (arguments
         (substitute-keyword-arguments (package-arguments base)
           ((#:phases phases)
