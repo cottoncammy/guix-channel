@@ -29,7 +29,7 @@
       (inherit base)
       (inputs (append
                 (filter
-                  (lambda (pkg)
-                    (not (string=? (package-name pkg) "libtomcrypt")))
+                  (lambda (package)
+                    (not (string=? (car package) "libtomcrypt")))
                   (package-inputs base))
                 (list libtomcrypt))))))
