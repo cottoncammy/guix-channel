@@ -30,6 +30,6 @@
       (inputs (append
                 (filter
                   (lambda (pkg)
-                    (not (eq? (package-name pkg) 'libtomcrypt)))
+                    (not (string=? (package-name pkg) "libtomcrypt")))
                   (package-inputs base))
                 libtomcrypt)))))
