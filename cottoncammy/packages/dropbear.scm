@@ -30,5 +30,5 @@
     (package
       (inherit base)
       (inputs (append
-                (list libtommath libxcrypt zlib)
+                (list multiprecision:libtommath libxcrypt zlib)
                 %libtomcrypt)))))
