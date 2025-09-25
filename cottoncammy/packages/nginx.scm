@@ -1,5 +1,9 @@
 (define-module (cottoncammy packages nginx)
   #:use-module ((gnu packages web) #:prefix web:)
+  #:use-module (gnu packages xml)
+  #:use-module (gnu packages pcre)
+  #:use-module (gnu packages tls)
+  #:use-module (gnu packages compression)
   #:use-module (guix packages)
   #:use-module (guix gexp)
   #:use-module (guix utils))
@@ -8,7 +12,7 @@
   (let ((base web:nginx))
     (package
       (inherit base)
-      (native-inputs (package-inputs base))
+      (native-inputs (list libxml2 libxslt pcre openssl zlib))
       (arguments
         (substitute-keyword-arguments (package-arguments base)
           ((#:phases phases)

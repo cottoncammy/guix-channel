@@ -1,13 +1,15 @@
 (define-module (cottoncammy packages dropbear)
   #:use-module ((gnu packages multiprecision) #:prefix multiprecision:)
   #:use-module ((gnu packages ssh) #:prefix ssh:)
+  #:use-module (gnu packages crypto)
+  #:use-module (gnu packages compression)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix git-download)
   #:use-module (guix gexp)
   #:use-module (guix utils))
 
-(define-public libtomcrypt
+(define %libtomcrypt
   (let ((base multiprecision:libtomcrypt))
     (package
       (inherit base)
@@ -28,8 +30,5 @@
     (package
       (inherit base)
       (inputs (append
-                (filter
-                  (lambda (package)
-                    (not (string=? (car package) "libtomcrypt")))
-                  (package-inputs base))
-                (cons ("libtomcrypt" libtomcrypt)))))))
+                (list libtommath libxcrypt zlib)
+                %libtomcrypt)))))
