@@ -32,4 +32,4 @@
                   (lambda (package)
                     (not (string=? (car package) "libtomcrypt")))
                   (package-inputs base))
-                `(("libtomcrypt" . libtomcrypt)))))))
+                (cons ("libtomcrypt" libtomcrypt)))))))
