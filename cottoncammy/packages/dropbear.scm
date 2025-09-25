@@ -32,4 +32,4 @@
                   (lambda (pkg)
                     (not (string=? (package-name pkg) "libtomcrypt")))
                   (package-inputs base))
-                libtomcrypt)))))
+                (list libtomcrypt))))))
