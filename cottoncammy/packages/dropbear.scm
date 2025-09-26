@@ -16,7 +16,7 @@
       (version "23803626b67e29c76a2fa98e7c9f15fa56b01680")
       (source
         (origin
-          (method url-fetch)
+          (method git-fetch)
           (uri (git-reference
                  (url "https://github.com/libtom/libtomcrypt")
                  (commit version)))
