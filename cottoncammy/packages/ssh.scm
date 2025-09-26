@@ -1,8 +1,8 @@
 ;;; SPDX-License-Identifier: GPL-3.0-or-later
 
-(define-module (cottoncammy packages dropbear)
-  #:use-module ((gnu packages multiprecision) #:prefix multiprecision:)
-  #:use-module ((gnu packages ssh) #:prefix ssh:)
+(define-module (cottoncammy packages ssh)
+  #:use-module (gnu packages multiprecision)
+  #:use-module (gnu packages ssh)
   #:use-module (gnu packages crypto)
   #:use-module (gnu packages compression)
   #:use-module (guix packages)
@@ -11,10 +11,11 @@
   #:use-module (guix gexp)
   #:use-module (guix utils))
 
-(define %libtomcrypt-variant
-  (let ((base multiprecision:libtomcrypt))
+(define-public libtomcrypt-variant
+  (let ((base libtomcrypt))
     (package
       (inherit base)
+      (name "libtomcrypt-variant")
       (version "23803626b67e29c76a2fa98e7c9f15fa56b01680")
       (source
         (origin
@@ -22,6 +23,7 @@
           (uri (git-reference
                  (url "https://github.com/libtom/libtomcrypt")
                  (commit version)))
+          (file-name (git-file-name name version))
           (sha256
             (base32
               "00yx4nl8ywji5lk5m92927ab68gjv17ihw1phsi71l4vm4jvpc54"))))
@@ -51,9 +53,8 @@
       (native-inputs '()))))
 
 (define-public dropbear-variant
-  (let ((base ssh:dropbear))
+  (let ((base dropbear))
     (package
       (inherit base)
-      (inputs (append
-                (list multiprecision:libtommath libxcrypt zlib)
-                (list %libtomcrypt-variant))))))
+      (name "dropbear-variant")
+      (inputs (list libtomcrypt-variant libtommath libxcrypt zlib)))))

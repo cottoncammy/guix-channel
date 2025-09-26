@@ -1,15 +1,16 @@
 ;;; SPDX-License-Identifier: GPL-3.0-or-later
 
 (define-module (cottoncammy packages fonts)
-  #:use-module ((gnu packages fonts) #:prefix fonts:)
+  #:use-module (gnu packages fonts)
   #:use-module (guix packages)
   #:use-module (guix gexp)
   #:use-module (guix utils))
 
 (define-public font-terminus-variant
-  (let ((base fonts:font-terminus))
+  (let ((base font-terminus))
     (package
       (inherit base)
+      (name "font-terminus-variant")
       (outputs (cons "psf" (package-outputs base)))
       (arguments
         (substitute-keyword-arguments (package-arguments base)

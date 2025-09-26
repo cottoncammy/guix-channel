@@ -1,7 +1,7 @@
 ;;; SPDX-License-Identifier: GPL-3.0-or-later
 
 (define-module (cottoncammy packages nginx)
-  #:use-module ((gnu packages web) #:prefix web:)
+  #:use-module (gnu packages web)
   #:use-module (gnu packages xml)
   #:use-module (gnu packages pcre)
   #:use-module (gnu packages tls)
@@ -11,9 +11,10 @@
   #:use-module (guix utils))
 
 (define-public nginx-variant
-  (let ((base web:nginx))
+  (let ((base nginx))
     (package
       (inherit base)
+      (name "nginx-variant")
       (native-inputs (list libxml2 libxslt pcre openssl zlib))
       (arguments
         (substitute-keyword-arguments (package-arguments base)
