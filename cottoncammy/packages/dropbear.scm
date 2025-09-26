@@ -1,3 +1,5 @@
+;;; SPDX-License-Identifier: GPL-3.0-or-later
+
 (define-module (cottoncammy packages dropbear)
   #:use-module ((gnu packages multiprecision) #:prefix multiprecision:)
   #:use-module ((gnu packages ssh) #:prefix ssh:)
@@ -9,7 +11,7 @@
   #:use-module (guix gexp)
   #:use-module (guix utils))
 
-(define %libtomcrypt
+(define %libtomcrypt-variant
   (let ((base multiprecision:libtomcrypt))
     (package
       (inherit base)
@@ -48,10 +50,10 @@
                       #t)))))))
       (native-inputs '()))))
 
-(define-public dropbear
+(define-public dropbear-variant
   (let ((base ssh:dropbear))
     (package
       (inherit base)
       (inputs (append
                 (list multiprecision:libtommath libxcrypt zlib)
-                (list %libtomcrypt))))))
+                (list %libtomcrypt-variant))))))
