@@ -2,10 +2,6 @@
 
 (define-module (cottoncammy packages nginx)
   #:use-module (gnu packages web)
-  #:use-module (gnu packages xml)
-  #:use-module (gnu packages pcre)
-  #:use-module (gnu packages tls)
-  #:use-module (gnu packages compression)
   #:use-module (guix packages)
   #:use-module (guix gexp)
   #:use-module (guix utils))
@@ -15,7 +11,7 @@
     (package
       (inherit base)
       (name "nginx-variant")
-      (native-inputs (list libxml2 libxslt pcre openssl zlib))
+      (native-inputs (package-inputs base))
       (arguments
         (substitute-keyword-arguments (package-arguments base)
           ((#:phases phases)

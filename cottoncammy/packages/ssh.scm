@@ -1,15 +1,29 @@
 ;;; SPDX-License-Identifier: GPL-3.0-or-later
 
 (define-module (cottoncammy packages ssh)
+  #:use-module (cottoncammy packages)
   #:use-module (gnu packages multiprecision)
   #:use-module (gnu packages ssh)
-  #:use-module (gnu packages crypto)
-  #:use-module (gnu packages compression)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix git-download)
   #:use-module (guix gexp)
   #:use-module (guix utils))
+
+(define-public libtommath-variant
+  (let ((base libtommath))
+    (package
+      (inherit base)
+      (name "libtommath-variant")
+      (source
+        (inherit (package-source base))
+        (patches (search-patch "libtommath-rm-libtool.patch")))
+      (arguments
+        (substitute-keyword-arguments (package-arguments base)
+          ((#:make-flags _)
+            #~(list (string-append "PREFIX=" (assoc-ref %outputs "out"))
+                    (string-append "CC=" #$(cc-for-target))))))
+      (native-inputs '()))))
 
 (define-public libtomcrypt-variant
   (let ((base libtomcrypt))
@@ -50,6 +64,8 @@
                       (copy-recursively (string-append out "/include")
                                         (string-append static "/include"))
                       #t)))))))
+      (inputs (modify-inputs (package-inputs base)
+                (replace "libtommath" libtommath-variant)))
       (native-inputs '()))))
 
 (define-public dropbear-variant
@@ -57,4 +73,8 @@
     (package
       (inherit base)
       (name "dropbear-variant")
-      (inputs (list libtomcrypt-variant libtommath libxcrypt zlib)))))
+      (inputs (modify-inputs (package-inputs base)
+                (replace "libtomcrypt" libtomcrypt-variant)
+                (repalce "libtommath" libtommath-variant))))))
+
+libtommath-variant

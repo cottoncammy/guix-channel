@@ -11,7 +11,7 @@
     (package
       (inherit base)
       (name "font-terminus-variant")
-      (outputs (cons "psf" (package-outputs base)))
+      (outputs (append (package-outputs base) '("psf")))
       (arguments
         (substitute-keyword-arguments (package-arguments base)
           ((#:phases phases)
@@ -24,3 +24,5 @@
                     (let ((psf (assoc-ref outputs "psf")))
                       (apply invoke "make" "install-psf" (string-append "prefix=" psf)
                              make-flags)))))))))))
+
+font-terminus-variant
