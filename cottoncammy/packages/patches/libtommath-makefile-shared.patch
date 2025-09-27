@@ -1,5 +1,5 @@
 diff --git a/makefile.shared b/makefile.shared
-index bf0ee43..136ae3f 100644
+index bf0ee43..bb9a3a0 100644
 --- a/makefile.shared
 +++ b/makefile.shared
 @@ -2,24 +2,38 @@
@@ -53,7 +53,7 @@ index bf0ee43..136ae3f 100644
  LCOV_ARGS=--directory .libs --directory .
  
  #START_INS
-@@ -58,43 +72,53 @@ bn_s_mp_toom_mul.o bn_s_mp_toom_sqr.o
+@@ -58,43 +72,51 @@ bn_s_mp_toom_mul.o bn_s_mp_toom_sqr.o
  objs: $(OBJECTS)
  
  .c.o: $(HEADERS)
@@ -62,9 +62,10 @@ index bf0ee43..136ae3f 100644
  
  LOBJECTS = $(OBJECTS:.o=.lo)
  
- $(LIBNAME):  $(OBJECTS)
+-$(LIBNAME):  $(OBJECTS)
 -	$(LTLINK) $(LTM_LDFLAGS) $(LOBJECTS) -o $(LIBNAME) -rpath $(LIBPATH) -version-info $(VERSION_SO) $(LTM_LIBTOOLFLAGS)
-+	$(CC) $(LTM_LDFLAGS) $(OBJECTS) $(SHARED) -Wl,-soname,$(TARGET).$(VERSION_MAJOR) $(NO_UNDEFINED) -o $@
++$(LIBNAME): $(OBJECTS)
++	$(CC) $(OBJECTS) $(LTM_LDFLAGS) $(SHARED) -Wl,-soname,$(TARGET).$(VERSION_MAJOR) $(NO_UNDEFINED) -o $@
 +
 +$(TARGET).$(VERSION_MAJOR) $(TARGET): $(LIBNAME)
 +	ln -sf $< $@
@@ -78,7 +79,6 @@ index bf0ee43..136ae3f 100644
 +	install -p -d $(DESTDIR)$(LIBPATH)
 +	$(INSTALL_CMD) -p -m 644 $(LIBNAME) $(DESTDIR)$(LIBPATH)/$(LIBNAME)
 +	install -p -m 644 $(HEADERS_PUB) $(DESTDIR)$(INCPATH)
-+
 +	ln -sf $(LIBNAME) $(DESTDIR)/$(LIBPATH)/$(TARGET).$(VERSION_MAJOR)
 +	ln -sf $(LIBNAME) $(DESTDIR)/$(LIBPATH)/$(TARGET)
  	sed -e 's,^prefix=.*,prefix=$(PREFIX),' -e 's,^Version:.*,Version: $(VERSION_PC),' -e 's,@CMAKE_INSTALL_LIBDIR@,lib,' \
@@ -95,7 +95,6 @@ index bf0ee43..136ae3f 100644
 -	rm $(DESTDIR)$(LIBPATH)/pkgconfig/libtommath.pc
 +	$(UNINSTALL_CMD) $(DESTDIR)$(LIBPATH)/$(LIBNAME)
 +	$(UNINSTALL_CMD) $(HEADER_FILES:%=$(DESTDIR)$(INCPATH)/%)
-+
 +	$(UNINSTALL_CMD) $(DESTDIR)/$(LIBPATH)/$(TARGET).$(VERSION_MAJOR)
 +	$(UNINSTALL_CMD) $(DESTDIR)/$(LIBPATH)/$(TARGET)
 +	$(UNINSTALL_CMD) $(DESTDIR)$(LIBPATH)/pkgconfig/libtommath.pc

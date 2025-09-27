@@ -1,5 +1,5 @@
 diff --git a/makefile_include.mk b/makefile_include.mk
-index df51a12..8317aa6 100644
+index df51a12..5b3f70d 100644
 --- a/makefile_include.mk
 +++ b/makefile_include.mk
 @@ -5,28 +5,27 @@
@@ -80,3 +80,11 @@ index df51a12..8317aa6 100644
  
  # adjust coverage set
  ifneq ($(filter $(_ARCH), i386 i686 x86_64 amd64 ia64),)
+@@ -138,7 +133,6 @@ DATAPATH ?= $(PREFIX)/share/doc/libtommath/pdf
+ #make the code coverage of the library
+ #
+ coverage: LTM_CFLAGS += -fprofile-arcs -ftest-coverage -DTIMING_NO_LOGS
+-coverage: LTM_LFLAGS += -lgcov
+ coverage: LTM_LDFLAGS += -lgcov
+ 
+ coverage: $(COVERAGE)
