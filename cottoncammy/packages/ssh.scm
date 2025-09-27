@@ -44,7 +44,14 @@
                                      (string-append static "/lib/libtommath.a"))
                         (copy-recursively (string-append out "/include")
                                           (string-append static "/include")))
-                    #t))))
+                    #t))
+                (replace 'check
+                  (lambda* (#:key tests? test-target #:allow-other-keys)
+                    (when tests?
+                      (apply invoke "make"
+                                    test-target (list (string-append "PREFIX=" (assoc-ref %outputs "out"))
+                                                      (string-append "CC=" (which "gcc"))))
+                      (invoke "sh" "test"))))))
           ((#:make-flags _)
             #~(list (string-append "PREFIX=" (assoc-ref %outputs "out"))
                     (string-append "CC=" #$(cc-for-target))
