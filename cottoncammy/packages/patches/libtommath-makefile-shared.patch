@@ -1,5 +1,5 @@
 diff --git a/makefile.shared b/makefile.shared
-index bf0ee43..c5c112f 100644
+index bf0ee43..525b069 100644
 --- a/makefile.shared
 +++ b/makefile.shared
 @@ -2,24 +2,38 @@
@@ -53,23 +53,21 @@ index bf0ee43..c5c112f 100644
  LCOV_ARGS=--directory .libs --directory .
  
  #START_INS
-@@ -58,43 +72,51 @@ bn_s_mp_toom_mul.o bn_s_mp_toom_sqr.o
+@@ -58,43 +72,49 @@ bn_s_mp_toom_mul.o bn_s_mp_toom_sqr.o
  objs: $(OBJECTS)
  
  .c.o: $(HEADERS)
 -	$(LTCOMPILE) $(LTM_CFLAGS) $(LTM_LDFLAGS) -o $@ -c $<
 +	$(CC) $(LTM_CFLAGS) $(PIC) -o $@ -c $<
-+
+ 
+-LOBJECTS = $(OBJECTS:.o=.lo)
 +$(LIBNAME): $(OBJECTS)
 +	$(CC) $(OBJECTS) $(SHARED) -Wl,-soname,$(TARGET).$(VERSION_MAJOR) $(NO_UNDEFINED) -o $@ $(LTM_LDFLAGS)
  
--LOBJECTS = $(OBJECTS:.o=.lo)
-+$(TARGET).$(VERSION_MAJOR) $(TARGET): $(LIBNAME)
-+	ln -sf $< $@
- 
 -$(LIBNAME):  $(OBJECTS)
 -	$(LTLINK) $(LTM_LDFLAGS) $(LOBJECTS) -o $(LIBNAME) -rpath $(LIBPATH) -version-info $(VERSION_SO) $(LTM_LIBTOOLFLAGS)
-+library: $(LIBNAME)
++$(TARGET).$(VERSION_MAJOR) $(TARGET): $(LIBNAME)
++	ln -sf $< $@
  
  install: $(LIBNAME)
 -	install -d $(DESTDIR)$(LIBPATH)
