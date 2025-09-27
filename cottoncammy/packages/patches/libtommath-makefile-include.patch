@@ -1,5 +1,5 @@
 diff --git a/makefile_include.mk b/makefile_include.mk
-index df51a12..797fcc8 100644
+index df51a12..f59103c 100644
 --- a/makefile_include.mk
 +++ b/makefile_include.mk
 @@ -7,26 +7,21 @@ VERSION=1.3.0
@@ -46,7 +46,7 @@ index df51a12..797fcc8 100644
  LTM_CFLAGS += -Wno-typedef-redefinition -Wno-tautological-compare -Wno-builtin-requires-header
  endif
  ifneq ($(findstring mingw,$(CC)),)
-@@ -97,16 +92,10 @@ endif
+@@ -97,22 +92,18 @@ endif
  ifeq ($(PLATFORM), Darwin)
  LTM_CFLAGS += -Wno-nullability-completeness
  endif
@@ -63,5 +63,13 @@ index df51a12..797fcc8 100644
 +LTM_CFLAGS := $(LTM_CFLAGS) $(CFLAGS)
 +LTM_LDFLAGS := $(LTM_LDFLAGS) $(LDFLAGS)
  
++ifndef _ARCH
  ifeq ($(PLATFORM),FreeBSD)
    _ARCH := $(shell sysctl -b hw.machine_arch)
+ else
+   _ARCH := $(shell uname -m)
+ endif
++endif
+ 
+ # adjust coverage set
+ ifneq ($(filter $(_ARCH), i386 i686 x86_64 amd64 ia64),)

@@ -27,9 +27,29 @@
                          "libtommath-makefile-shared.patch")))))
       (arguments
         (substitute-keyword-arguments (package-arguments base)
+          ((#:phases phases)
+            #~(modify-phases #$phases
+                (delete 'remove-static-library)
+                (replace 'install-static-library
+                  (lambda* (#:key outputs make-flags #:allow-other-keys)
+                    (apply invoke "make" "-f" "makefile.unix" "install" make-flags)
+                      (let ((out (assoc-ref outputs "out"))
+                            (static (assoc-ref outputs "static")))
+                        (mkdir-p (string-append static "/lib"))
+                        (mkdir-p (string-append static "/include"))
+                        (rename-file (string-append out "/lib/libtommath.a")
+                                     (string-append static "/lib/libtommath.a"))
+                        (copy-recursively (string-append out "/include")
+                                          (string-append static "/include")))
+                    #t))))
           ((#:make-flags _)
             #~(list (string-append "PREFIX=" (assoc-ref %outputs "out"))
-                    (string-append "CC=" #$(cc-for-target))))))
+                    (string-append "CC=" #$(cc-for-target))
+                    (map
+                      (lambda (target)
+                        (when (not (string-null? target))
+                          (string-append "_ARCH=" (cut string-prefix? <> target))))
+                      %current-target-system)))))
       (native-inputs '()))))
 
 (define-public libtomcrypt-variant
