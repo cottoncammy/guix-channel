@@ -18,6 +18,25 @@ index bf0ee43..4aeaeb1 100644
 +ifeq ($(UNAME), Darwin)
 +       NO_UNDEFINED := -Wl,-undefined,error
 +       SHARED += -dynamiclib
++else
++       NO_UNDEFINED := -Wl,--no-undefined
++       SHARED += -shared
++endif
++
++ifeq ($(PLATFORM), Darwin)
++       TARGET := $(NAME).dylib
++else ifeq ($(OS), Windows_NT)
++       TARGET := $(NAME).dll
++else
++       TARGET := $(NAME).so
++endif
++
+ #default files to install
+ ifndef LIBNAME
+-   LIBNAME=libtommath.la
++       LIBNAME = $(TARGET).$(VERSION_LT)
+ endif
+
  include makefile_include.mk
 
 -
