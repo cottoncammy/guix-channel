@@ -1,23 +1,30 @@
 ;;; SPDX-License-Identifier: GPL-3.0-or-later
 
 (define-module (cottoncammy packages ssh)
-  #:use-module (cottoncammy packages)
   #:use-module (gnu packages multiprecision)
   #:use-module (gnu packages ssh)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix git-download)
   #:use-module (guix gexp)
-  #:use-module (guix utils))
+  #:use-module (guix utils)
+  #:use-module (srfi srfi-26))
 
 (define-public libtommath-variant
   (let ((base libtommath))
     (package
       (inherit base)
       (name "libtommath-variant")
-      (source
-        (inherit (package-source base))
-        (patches (search-patch "libtommath-rm-libtool.patch")))
+      (source (origin
+                (inherit (package-source base))
+                (patches
+                  (map (lambda (patch)
+                         (search-path
+                           (map (cut string-append <> "/cottoncammy/packages/patches")
+                                %load-path)
+                           patch))
+                       '("libtommath-makefile-include.patch"
+                         "libtommath-makefile-shared.patch")))))
       (arguments
         (substitute-keyword-arguments (package-arguments base)
           ((#:make-flags _)
@@ -75,6 +82,6 @@
       (name "dropbear-variant")
       (inputs (modify-inputs (package-inputs base)
                 (replace "libtomcrypt" libtomcrypt-variant)
-                (repalce "libtommath" libtommath-variant))))))
+                (replace "libtommath" libtommath-variant))))))
 
 libtommath-variant
