@@ -1,5 +1,5 @@
 diff --git a/makefile.shared b/makefile.shared
-index bf0ee43..bb9a3a0 100644
+index bf0ee43..3aadbc5 100644
 --- a/makefile.shared
 +++ b/makefile.shared
 @@ -2,24 +2,38 @@
@@ -65,7 +65,7 @@ index bf0ee43..bb9a3a0 100644
 -$(LIBNAME):  $(OBJECTS)
 -	$(LTLINK) $(LTM_LDFLAGS) $(LOBJECTS) -o $(LIBNAME) -rpath $(LIBPATH) -version-info $(VERSION_SO) $(LTM_LIBTOOLFLAGS)
 +$(LIBNAME): $(OBJECTS)
-+	$(CC) $(OBJECTS) $(LTM_LDFLAGS) $(SHARED) -Wl,-soname,$(TARGET).$(VERSION_MAJOR) $(NO_UNDEFINED) -o $@
++	$(CC) $(OBJECTS) $(SHARED) -Wl,-soname,$(TARGET).$(VERSION_MAJOR) $(NO_UNDEFINED) -o $@ $(LTM_LDFLAGS)
 +
 +$(TARGET).$(VERSION_MAJOR) $(TARGET): $(LIBNAME)
 +	ln -sf $< $@
@@ -104,21 +104,21 @@ index bf0ee43..bb9a3a0 100644
  
  test mtest_opponent: demo/shared.o $(LIBNAME) | demo/test.o demo/mtest_opponent.o
 -	$(LTLINK) $(LTM_LDFLAGS) demo/$@.o $^ -o $@
-+	$(CC) $(LTM_LDFLAGS) $(NO_UNDEFINED) demo/$@.o $^ -o $@
++	$(CC) $(NO_UNDEFINED) demo/$@.o $^ -o $@ $(LTM_LDFLAGS)
  
  .PHONY: mtest
  mtest:
 -	cd mtest ; $(CC) $(LTM_CFLAGS) -O0 mtest.c $(LTM_LDFLAGS) -o mtest
-+	cd mtest ; $(CC) $(LTM_CFLAGS) $(NO_UNDEFINED) -O0 mtest.c $(LTM_LDFLAGS) -o mtest
++	cd mtest ; $(CC) $(LTM_CFLAGS) $(NO_UNDEFINED) -O0 mtest.c -o mtest $(LTM_LDFLAGS)
  
  timing: $(LIBNAME) demo/timing.c
 -	$(LTLINK) $(LTM_CFLAGS) $(LTM_LDFLAGS) -DTIMER demo/timing.c $(LIBNAME) -o timing
-+	$(CC) $(LTM_CFLAGS) $(LTM_LDFLAGS) $(NO_UNDEFINED) -DTIMER demo/timing.c $(LIBNAME) -o timing
++	$(CC) $(LTM_CFLAGS) $(NO_UNDEFINED) -DTIMER demo/timing.c $(LIBNAME) -o timing $(LTM_LDFLAGS)
  
  tune: $(LIBNAME)
 -	$(LTCOMPILE) $(LTM_CFLAGS) -c etc/tune.c -o etc/tune.o
 -	$(LTLINK) $(LTM_LDFLAGS) -o etc/tune etc/tune.o $(LIBNAME)
 +	$(CC) $(LTM_CFLAGS) -c etc/tune.c -o etc/tune.o
-+	$(CC) $(LTM_LDFLAGS) -o etc/tune etc/tune.o $(LIBNAME)
++	$(CC) -o etc/tune etc/tune.o $(LIBNAME) $(LTM_LDFLAGS)
  	cd etc/; /bin/sh tune_it.sh; cd ..
  	$(MAKE) -f makefile.shared
