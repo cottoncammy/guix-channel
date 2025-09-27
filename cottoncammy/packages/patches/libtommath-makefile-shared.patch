@@ -5,7 +5,7 @@ index bf0ee43..136ae3f 100644
 @@ -2,24 +2,38 @@
  #
  #Tom St Denis
-
+ 
 +PLATFORM := $(shell uname | sed -e 's/_.*//')
 +
 +INSTALL_CMD := install
@@ -16,29 +16,29 @@ index bf0ee43..136ae3f 100644
 +SHARED := $(PIC)
 +
 +ifeq ($(UNAME), Darwin)
-+       NO_UNDEFINED := -Wl,-undefined,error
-+       SHARED += -dynamiclib
++	NO_UNDEFINED := -Wl,-undefined,error
++	SHARED += -dynamiclib
 +else
-+       NO_UNDEFINED := -Wl,--no-undefined
-+       SHARED += -shared
++	NO_UNDEFINED := -Wl,--no-undefined
++	SHARED += -shared
 +endif
 +
 +ifeq ($(PLATFORM), Darwin)
-+       TARGET := $(NAME).dylib
++	TARGET := $(NAME).dylib
 +else ifeq ($(OS), Windows_NT)
-+       TARGET := $(NAME).dll
++	TARGET := $(NAME).dll
 +else
-+       TARGET := $(NAME).so
++	TARGET := $(NAME).so
 +endif
 +
  #default files to install
  ifndef LIBNAME
 -   LIBNAME=libtommath.la
-+       LIBNAME = $(TARGET).$(VERSION_LT)
++	LIBNAME = $(TARGET).$(VERSION_LT)
  endif
-
+ 
  include makefile_include.mk
-
+ 
 -
 -ifndef LIBTOOL
 -  ifeq ($(PLATFORM), Darwin)
@@ -51,75 +51,75 @@ index bf0ee43..136ae3f 100644
 -LTLINK = $(LIBTOOL) --mode=link --tag=CC $(CC)
 -
  LCOV_ARGS=--directory .libs --directory .
-
+ 
  #START_INS
 @@ -58,43 +72,53 @@ bn_s_mp_toom_mul.o bn_s_mp_toom_sqr.o
  objs: $(OBJECTS)
-
+ 
  .c.o: $(HEADERS)
--       $(LTCOMPILE) $(LTM_CFLAGS) $(LTM_LDFLAGS) -o $@ -c $<
-+       $(CC) $(LTM_CFLAGS) $(PIC) -o $@ -c $<
-
+-	$(LTCOMPILE) $(LTM_CFLAGS) $(LTM_LDFLAGS) -o $@ -c $<
++	$(CC) $(LTM_CFLAGS) $(PIC) -o $@ -c $<
+ 
  LOBJECTS = $(OBJECTS:.o=.lo)
-
+ 
  $(LIBNAME):  $(OBJECTS)
--       $(LTLINK) $(LTM_LDFLAGS) $(LOBJECTS) -o $(LIBNAME) -rpath $(LIBPATH) -version-info $(VERSION_SO) $(LTM_LIBTOOLFLAGS)
-+       $(CC) $(LTM_LDFLAGS) $(OBJECTS) $(SHARED) -Wl,-soname,$(TARGET).$(VERSION_MAJOR) $(NO_UNDEFINED) -o $@
+-	$(LTLINK) $(LTM_LDFLAGS) $(LOBJECTS) -o $(LIBNAME) -rpath $(LIBPATH) -version-info $(VERSION_SO) $(LTM_LIBTOOLFLAGS)
++	$(CC) $(LTM_LDFLAGS) $(OBJECTS) $(SHARED) -Wl,-soname,$(TARGET).$(VERSION_MAJOR) $(NO_UNDEFINED) -o $@
 +
 +$(TARGET).$(VERSION_MAJOR) $(TARGET): $(LIBNAME)
-+       ln -sf $< $@
-
++	ln -sf $< $@
+ 
  install: $(LIBNAME)
--       install -d $(DESTDIR)$(LIBPATH)
--       install -d $(DESTDIR)$(INCPATH)
--       $(LIBTOOL) --mode=install install -m 644 $(LIBNAME) $(DESTDIR)$(LIBPATH)/$(LIBNAME)
--       install -m 644 $(HEADERS_PUB) $(DESTDIR)$(INCPATH)
-+       install -p -d $(DESTDIR)$(INCPATH)
-+       install -p -d $(DESTDIR)$(LIBPATH)
-+       $(INSTALL_CMD) -p -m 644 $(LIBNAME) $(DESTDIR)$(LIBPATH)/$(LIBNAME)
-+       install -p -m 644 $(HEADERS_PUB) $(DESTDIR)$(INCPATH)
+-	install -d $(DESTDIR)$(LIBPATH)
+-	install -d $(DESTDIR)$(INCPATH)
+-	$(LIBTOOL) --mode=install install -m 644 $(LIBNAME) $(DESTDIR)$(LIBPATH)/$(LIBNAME)
+-	install -m 644 $(HEADERS_PUB) $(DESTDIR)$(INCPATH)
++	install -p -d $(DESTDIR)$(INCPATH)
++	install -p -d $(DESTDIR)$(LIBPATH)
++	$(INSTALL_CMD) -p -m 644 $(LIBNAME) $(DESTDIR)$(LIBPATH)/$(LIBNAME)
++	install -p -m 644 $(HEADERS_PUB) $(DESTDIR)$(INCPATH)
 +
-+       ln -sf $(LIBNAME) $(DESTDIR)/$(LIBPATH)/$(TARGET).$(VERSION_MAJOR)
-+       ln -sf $(LIBNAME) $(DESTDIR)/$(LIBPATH)/$(TARGET)
-        sed -e 's,^prefix=.*,prefix=$(PREFIX),' -e 's,^Version:.*,Version: $(VERSION_PC),' -e 's,@CMAKE_INSTALL_LIBDIR@,lib,' \
-                -e 's,@CMAKE_INSTALL_INCLUDEDIR@,include,' libtommath.pc.in > libtommath.pc
--       install -d $(DESTDIR)$(LIBPATH)/pkgconfig
--       install -m 644 libtommath.pc $(DESTDIR)$(LIBPATH)/pkgconfig/
-+       $(INSTALL_CMD) -p -d $(DESTDIR)$(LIBPATH)/pkgconfig
-+       $(INSTALL_CMD) -p -m 644 libtommath.pc $(DESTDIR)$(LIBPATH)/pkgconfig/
-
++	ln -sf $(LIBNAME) $(DESTDIR)/$(LIBPATH)/$(TARGET).$(VERSION_MAJOR)
++	ln -sf $(LIBNAME) $(DESTDIR)/$(LIBPATH)/$(TARGET)
+ 	sed -e 's,^prefix=.*,prefix=$(PREFIX),' -e 's,^Version:.*,Version: $(VERSION_PC),' -e 's,@CMAKE_INSTALL_LIBDIR@,lib,' \
+ 		-e 's,@CMAKE_INSTALL_INCLUDEDIR@,include,' libtommath.pc.in > libtommath.pc
+-	install -d $(DESTDIR)$(LIBPATH)/pkgconfig
+-	install -m 644 libtommath.pc $(DESTDIR)$(LIBPATH)/pkgconfig/
++	$(INSTALL_CMD) -p -d $(DESTDIR)$(LIBPATH)/pkgconfig
++	$(INSTALL_CMD) -p -m 644 libtommath.pc $(DESTDIR)$(LIBPATH)/pkgconfig/
+ 
 +HEADER_FILES=$(notdir $(HEADERS_PUB))
  uninstall:
--       $(LIBTOOL) --mode=uninstall rm $(DESTDIR)$(LIBPATH)/$(LIBNAME)
--       rm $(HEADERS_PUB:%=$(DESTDIR)$(INCPATH)/%)
--       rm $(DESTDIR)$(LIBPATH)/pkgconfig/libtommath.pc
-+       $(UNINSTALL_CMD) $(DESTDIR)$(LIBPATH)/$(LIBNAME)
-+       $(UNINSTALL_CMD) $(HEADER_FILES:%=$(DESTDIR)$(INCPATH)/%)
+-	$(LIBTOOL) --mode=uninstall rm $(DESTDIR)$(LIBPATH)/$(LIBNAME)
+-	rm $(HEADERS_PUB:%=$(DESTDIR)$(INCPATH)/%)
+-	rm $(DESTDIR)$(LIBPATH)/pkgconfig/libtommath.pc
++	$(UNINSTALL_CMD) $(DESTDIR)$(LIBPATH)/$(LIBNAME)
++	$(UNINSTALL_CMD) $(HEADER_FILES:%=$(DESTDIR)$(INCPATH)/%)
 +
-+       $(UNINSTALL_CMD) $(DESTDIR)/$(LIBPATH)/$(TARGET).$(VERSION_MAJOR)
-+       $(UNINSTALL_CMD) $(DESTDIR)/$(LIBPATH)/$(TARGET)
-+       $(UNINSTALL_CMD) $(DESTDIR)$(LIBPATH)/pkgconfig/libtommath.pc
-
++	$(UNINSTALL_CMD) $(DESTDIR)/$(LIBPATH)/$(TARGET).$(VERSION_MAJOR)
++	$(UNINSTALL_CMD) $(DESTDIR)/$(LIBPATH)/$(TARGET)
++	$(UNINSTALL_CMD) $(DESTDIR)$(LIBPATH)/pkgconfig/libtommath.pc
+ 
  test_standalone: test
-        @echo "test_standalone is deprecated, please use make-target 'test'"
-
+ 	@echo "test_standalone is deprecated, please use make-target 'test'"
+ 
  test mtest_opponent: demo/shared.o $(LIBNAME) | demo/test.o demo/mtest_opponent.o
--       $(LTLINK) $(LTM_LDFLAGS) demo/$@.o $^ -o $@
-+       $(CC) $(LTM_LDFLAGS) $(NO_UNDEFINED) demo/$@.o $^ -o $@
-
+-	$(LTLINK) $(LTM_LDFLAGS) demo/$@.o $^ -o $@
++	$(CC) $(LTM_LDFLAGS) $(NO_UNDEFINED) demo/$@.o $^ -o $@
+ 
  .PHONY: mtest
  mtest:
--       cd mtest ; $(CC) $(LTM_CFLAGS) -O0 mtest.c $(LTM_LDFLAGS) -o mtest
-+       cd mtest ; $(CC) $(LTM_CFLAGS) $(NO_UNDEFINED) -O0 mtest.c $(LTM_LDFLAGS) -o mtest
-
+-	cd mtest ; $(CC) $(LTM_CFLAGS) -O0 mtest.c $(LTM_LDFLAGS) -o mtest
++	cd mtest ; $(CC) $(LTM_CFLAGS) $(NO_UNDEFINED) -O0 mtest.c $(LTM_LDFLAGS) -o mtest
+ 
  timing: $(LIBNAME) demo/timing.c
--       $(LTLINK) $(LTM_CFLAGS) $(LTM_LDFLAGS) -DTIMER demo/timing.c $(LIBNAME) -o timing
-+       $(CC) $(LTM_CFLAGS) $(LTM_LDFLAGS) $(NO_UNDEFINED) -DTIMER demo/timing.c $(LIBNAME) -o timing
-
+-	$(LTLINK) $(LTM_CFLAGS) $(LTM_LDFLAGS) -DTIMER demo/timing.c $(LIBNAME) -o timing
++	$(CC) $(LTM_CFLAGS) $(LTM_LDFLAGS) $(NO_UNDEFINED) -DTIMER demo/timing.c $(LIBNAME) -o timing
+ 
  tune: $(LIBNAME)
--       $(LTCOMPILE) $(LTM_CFLAGS) -c etc/tune.c -o etc/tune.o
--       $(LTLINK) $(LTM_LDFLAGS) -o etc/tune etc/tune.o $(LIBNAME)
-+       $(CC) $(LTM_CFLAGS) -c etc/tune.c -o etc/tune.o
-+       $(CC) $(LTM_LDFLAGS) -o etc/tune etc/tune.o $(LIBNAME)
-        cd etc/; /bin/sh tune_it.sh; cd ..
-        $(MAKE) -f makefile.shared
+-	$(LTCOMPILE) $(LTM_CFLAGS) -c etc/tune.c -o etc/tune.o
+-	$(LTLINK) $(LTM_LDFLAGS) -o etc/tune etc/tune.o $(LIBNAME)
++	$(CC) $(LTM_CFLAGS) -c etc/tune.c -o etc/tune.o
++	$(CC) $(LTM_LDFLAGS) -o etc/tune etc/tune.o $(LIBNAME)
+ 	cd etc/; /bin/sh tune_it.sh; cd ..
+ 	$(MAKE) -f makefile.shared
