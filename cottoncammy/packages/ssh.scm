@@ -27,6 +27,9 @@
                          "libtommath-makefile-shared.patch")))))
       (arguments
         (substitute-keyword-arguments (package-arguments base)
+          ((#:modules modules)
+           `((srfi srfi-26)
+             ,@modules))
           ((#:phases phases)
             #~(modify-phases #$phases
                 (delete 'remove-static-library)
@@ -45,11 +48,9 @@
           ((#:make-flags _)
             #~(list (string-append "PREFIX=" (assoc-ref %outputs "out"))
                     (string-append "CC=" #$(cc-for-target))
-                    (map
-                      (lambda (target)
-                        (when (not (string-null? target))
-                          (string-append "_ARCH=" (cut string-prefix? <> target))))
-                      %current-target-system)))))
+                    (let ((target #$(%current-target-system)))
+                      (when (not (string-null? target))
+                        (string-append "_ARCH=" (car (string-split target #\-)))))))))
       (native-inputs '()))))
 
 (define-public libtomcrypt-variant
