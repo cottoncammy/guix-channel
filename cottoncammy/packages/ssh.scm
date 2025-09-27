@@ -104,5 +104,3 @@
       (inputs (modify-inputs (package-inputs base)
                 (replace "libtomcrypt" libtomcrypt-variant)
                 (replace "libtommath" libtommath-variant))))))
-
-libtommath-variant
