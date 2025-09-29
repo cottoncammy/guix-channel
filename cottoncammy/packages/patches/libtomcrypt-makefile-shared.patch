@@ -1,0 +1,110 @@
+diff --git a/makefile.shared b/makefile.shared
+index 98ec2b50..2b40b396 100644
+--- a/makefile.shared
++++ b/makefile.shared
+@@ -1,6 +1,6 @@
+ # MAKEFILE for linux GCC
+ #
+-# This makefile produces a shared object and requires libtool to be installed.
++# This makefile produces a shared object.
+ #
+ # Thanks to Zed Shaw for helping debug this on BSD/OSX.
+ # Tom St Denis
+@@ -16,23 +16,32 @@
+ 
+ PLATFORM := $(shell uname | sed -e 's/_.*//')
+ 
+-ifndef LIBTOOL
+-  ifeq ($(PLATFORM), Darwin)
+-    LIBTOOL:=glibtool
+-  else
+-    LIBTOOL:=libtool
+-  endif
++INSTALL_CMD := install
++UNINSTALL_CMD := rm -f
++
++NAME := libtomcrypt
++PIC := -fPIC
++SHARED := $(PIC)
++
++ifeq ($(UNAME), Darwin)
++	NO_UNDEFINED := -Wl,-undefined,error
++	SHARED += -dynamiclib
++else
++	NO_UNDEFINED := -Wl,--no-undefined
++	SHARED += -shared
+ endif
+-ifeq ($(PLATFORM), CYGWIN)
+-  NO_UNDEFINED:=-no-undefined
++
++ifeq ($(PLATFORM), Darwin)
++	TARGET := $(NAME).dylib
++else ifeq ($(OS), Windows_NT)
++	TARGET := $(NAME).dll
++else
++	TARGET := $(NAME).so
+ endif
+-LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC)
+-INSTALL_CMD = $(LIBTOOL) --mode=install install
+-UNINSTALL_CMD = $(LIBTOOL) --mode=uninstall rm
+ 
+-#Output filenames for various targets.
++#default files to install
+ ifndef LIBNAME
+-   LIBNAME=libtomcrypt.la
++	LIBNAME = $(TARGET).$(VERSION_LT)
+ endif
+ 
+ 
+@@ -41,36 +50,40 @@ include makefile_include.mk
+ 
+ #ciphers come in two flavours... enc+dec and enc
+ src/ciphers/aes/aes_enc.o: src/ciphers/aes/aes.c src/ciphers/aes/aes_tab.c
+-	$(LTCOMPILE) $(LTC_CFLAGS) $(CPPFLAGS) $(LTC_LDFLAGS) -DENCRYPT_ONLY -c src/ciphers/aes/aes.c -o src/ciphers/aes/aes_enc.o
++	$(CC) $(LTC_CFLAGS) $(PIC) $(CPPFLAGS) -DENCRYPT_ONLY -c src/ciphers/aes/aes.c -o src/ciphers/aes/aes_enc.o
+ 
+ .c.o:
+-	$(LTCOMPILE) $(LTC_CFLAGS) $(CPPFLAGS) $(LTC_LDFLAGS) -o $@ -c $<
+-
+-LOBJECTS = $(OBJECTS:.o=.lo)
++	$(CC) $(LTC_CFLAGS) $(PIC) $(CPPFLAGS) -o $@ -c $<
+ 
+ $(LIBNAME): $(OBJECTS)
+-	$(LIBTOOL) --mode=link --tag=CC $(CC) $(LTC_LDFLAGS) $(LOBJECTS) $(EXTRALIBS) -o $@ -rpath $(LIBPATH) -version-info $(VERSION_LT) $(NO_UNDEFINED)
++	$(CC) $(LTC_LDFLAGS) $(OBJECTS) $(EXTRALIBS) $(SHARED) -Wl,-soname,$(TARGET).$(VERSION_MAJOR) $(NO_UNDEFINED) -o $@
++	ln -sf $(LIBNAME) $(TARGET).$(VERSION_MAJOR)
++	ln -sf $(LIBNAME) $(TARGET)
+ 
+ test: $(call print-help,test,Builds the library and the 'test' application to run all self-tests) $(LIBNAME) $(TOBJECTS)
+-	$(LIBTOOL) --mode=link --tag=CC $(CC) $(LTC_LDFLAGS) -o $(TEST) $(TOBJECTS) $(LIBNAME) $(EXTRALIBS)
++	$(CC) $(LTC_LDFLAGS) -o $(TEST) $(TOBJECTS) $(LIBNAME) -Wl,-rpath=./ $(EXTRALIBS)
+ 
+ # build the demos from a template
+ define DEMO_template
+-$(1): $(call print-help,$(1),Builds the library and the '$(1)' demo) demos/$(1).o $$(LIBNAME)
+-	$$(LIBTOOL) --mode=link --tag=CC $$(CC) $$(LTC_LDFLAGS) $$^ $$(EXTRALIBS) -o $(1)
++$(1): $(call print-help,$(1),Builds the library and the '$(1)' demo) demos/$(1).o $$(TARGET).$$(VERSION_MAJOR) $$(TARGET)
++	$$(CC) $$(LTC_LDFLAGS) $$< -L. -ltomcrypt $$(EXTRALIBS) $(NO_UNDEFINED) -Wl,-rpath=./ -o $$@
+ endef
+ 
+ $(foreach demo, $(strip $(DEMOS)), $(eval $(call DEMO_template,$(demo))))
+ 
+ install: $(call print-help,install,Installs the library + headers + pkg-config file) .common_install
++	ln -sf $(LIBNAME) $(DESTDIR)/$(LIBPATH)/$(TARGET).$(VERSION_MAJOR)
++	ln -sf $(LIBNAME) $(DESTDIR)/$(LIBPATH)/$(TARGET)
+ 	sed -e 's,^prefix=.*,prefix=$(PREFIX),' -e 's,^Version:.*,Version: $(VERSION_PC),' libtomcrypt.pc.in > libtomcrypt.pc
+-	install -p -d $(DESTDIR)$(LIBPATH)/pkgconfig
+-	install -p -m 644 libtomcrypt.pc $(DESTDIR)$(LIBPATH)/pkgconfig/
++	$(INSTALL_CMD) -p -d $(DESTDIR)$(LIBPATH)/pkgconfig
++	$(INSTALL_CMD) -p -m 644 libtomcrypt.pc $(DESTDIR)$(LIBPATH)/pkgconfig/
+ 
+ install_bins: $(call print-help,install_bins,Installs the useful demos ($(USEFUL_DEMOS))) .common_install_bins
+ 
+ uninstall: $(call print-help,uninstall,Uninstalls the library + headers + pkg-config file) .common_uninstall
+-	rm $(DESTDIR)$(LIBPATH)/pkgconfig/libtomcrypt.pc
++	$(UNINSTALL_CMD) $(DESTDIR)/$(LIBPATH)/$(TARGET).$(VERSION_MAJOR)
++	$(UNINSTALL_CMD) $(DESTDIR)/$(LIBPATH)/$(TARGET)
++	$(UNINSTALL_CMD) $(DESTDIR)$(LIBPATH)/pkgconfig/libtomcrypt.pc
+ 
+ # ref:         $Format:%D$
+ # git commit:  $Format:%H$

@@ -72,37 +72,40 @@
 (define (pgit-shepherd-service config)
   (match-record config <pgit-configuration>
                 (pgit repositories shepherd-provision shepherd-requirement)
-    (let ((pgit-commands
-            (map (match-lambda
-                   (($ <pgit-repository> out-path path revisions theme label clone-url
-                                         home-url description root-relative
-                                         max-commits hide-tree-last-commit?)
-                    (list pgit
-                          (if (string-null? out-path) '() '("-out" out-path))
-                          (if (string-null? path) '() '("-repo" path))
-                          (if (null? revisions)
-                                '() '(("-revs")
-                                      (format #f "~{~a ~}" (string-join revisions ","))))
-                          (if (string-null? theme) '() '("-theme" theme))
-                          (if (string-null? label) '() '("-label" label))
-                          (if (string-null? clone-url) '() '("-clone-url" clone-url))
-                          (if (string-null? home-url) '() '("-home-url" home-url))
-                          (if (string-null? description) '() '("-desc" description))
-                          (if (string-null? root-relative)
+
+    (define pgit-commands
+      #~(list
+        #$@(apply append
+             (map (match-lambda
+               (($ <pgit-repository> out-path path revisions theme label clone-url
+                                     home-url description root-relative
+                                     max-commits hide-tree-last-commit?)
+                 (list #$pgit
+                       #$@(if (string-null? out-path) '() '("-out" out-path))
+                       #$@(if (string-null? path) '() '("-repo" path))
+                       #$@(if (null? revisions)
+                                '() (list "-revs" (format #f "~{~a~}" revisions)))
+                       #$@(if (string-null? theme) '() '("-theme" theme))
+                       #$@(if (string-null? label) '() '("-label" label))
+                       #$@(if (string-null? clone-url) '() '("-clone-url" clone-url))
+                       #$@(if (string-null? home-url) '() '("-home-url" home-url))
+                       #$@(if (string-null? description) '() '("-desc" description))
+                       #$@(if (string-null? root-relative)
                                 '() '("-root-relative" root-relative))
-                          (if (not max-commits)
+                       #$@(if (not max-commits)
                                 '() '("-max-commits" (number->string max-commits)))
-                          (if hide-tree-last-commit? '("-hide-tree-last-commit") '()))))
-                repositories)))
+                       #$@(if hide-tree-last-commit? '("-hide-tree-last-commit") '()))))
+                repositories))))
+
       (list
         (shepherd-service
           (documentation "Run pgit, a static site generator for Git repositories.")
           (provision shepherd-provision)
           (requirement shepherd-requirement)
-          (start #~(make-system-constructor #$pgit-commands))
+          (start #~(make-system-constructor #$@pgit-commands))
           (stop #~(make-system-destructor))
           (one-shot? #t)
-          (respawn? #f))))))
+          (respawn? #f)))))
 
 (define (pgit-nginx-server config)
   (match-record config <pgit-configuration>

@@ -150,7 +150,7 @@
                      #:group "dnscrypt-proxy"
                      #:pid-file #$pid-file))
           (stop #~(make-kill-destructor))
-          (actions #~(list (shepherd-configuration-action #$computed-config))))))))
+          (actions (list (shepherd-configuration-action computed-config))))))))
 
 (define %dnscrypt-proxy-accounts
   (list (user-group
